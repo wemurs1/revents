@@ -1,7 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Dropdown, Image, Menu } from 'semantic-ui-react';
 
-export default function SignedInMenu() {
+type Props = {
+  setAuth: (value: boolean) => void;
+};
+
+export default function SignedInMenu({ setAuth }: Props) {
+  const navigate = useNavigate();
+
+  function handleSignOut() {
+    setAuth(false);
+    navigate('/');
+  }
+
   return (
     <Menu.Item position='right'>
       <Image avatar spaced='right' src='/user.png' />
@@ -14,7 +25,7 @@ export default function SignedInMenu() {
             icon='plus'
           />
           <Dropdown.Item text='My profile' icon='user' />
-          <Dropdown.Item text='Sign out' icon='power' />
+          <Dropdown.Item text='Sign out' icon='power' onClick={handleSignOut} />
         </Dropdown.Menu>
       </Dropdown>
     </Menu.Item>
