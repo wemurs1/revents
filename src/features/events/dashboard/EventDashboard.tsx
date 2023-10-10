@@ -9,7 +9,7 @@ type Props = {
   formOpen: boolean;
   setFormOpen: (value: boolean) => void;
   selectedEvent: AppEvent | null;
-  selectEvent: (event: AppEvent) => void;
+  selectEvent: (event: AppEvent | null) => void;
 };
 
 export default function EventDashboard({
@@ -30,15 +30,18 @@ export default function EventDashboard({
     });
   }
 
-  function handleSelectEvent(event: AppEvent) {
-    selectEvent(event);
-    setFormOpen(true);
+  function updateEvent(updatedEvent: AppEvent) {
+    setEvents(
+      events.map((evt) => (evt.id === updatedEvent.id ? updatedEvent : evt))
+    );
+    selectEvent(null);
+    setFormOpen(false);
   }
 
   return (
     <Grid>
       <Grid.Column width={10}>
-        <EventList events={events} selectEvent={handleSelectEvent} />
+        <EventList events={events} selectEvent={selectEvent} />
       </Grid.Column>
       <Grid.Column width={6}>
         {formOpen && (
@@ -47,6 +50,7 @@ export default function EventDashboard({
             addEvent={addEvent}
             selectedEvent={selectedEvent}
             key={selectedEvent ? selectedEvent.id : 'create'}
+            updateEvent={updateEvent}
           />
         )}
       </Grid.Column>
