@@ -8,9 +8,16 @@ import { sampleData } from '../../../app/api/sampleData';
 type Props = {
   formOpen: boolean;
   setFormOpen: (value: boolean) => void;
+  selectedEvent: AppEvent | null;
+  selectEvent: (event: AppEvent) => void;
 };
 
-export default function EventDashboard({ formOpen, setFormOpen }: Props) {
+export default function EventDashboard({
+  formOpen,
+  setFormOpen,
+  selectedEvent,
+  selectEvent,
+}: Props) {
   const [events, setEvents] = useState<AppEvent[]>([]);
 
   useEffect(() => {
@@ -23,14 +30,24 @@ export default function EventDashboard({ formOpen, setFormOpen }: Props) {
     });
   }
 
+  function handleSelectEvent(event: AppEvent) {
+    selectEvent(event);
+    setFormOpen(true);
+  }
+
   return (
     <Grid>
       <Grid.Column width={10}>
-        <EventList events={events} />
+        <EventList events={events} selectEvent={handleSelectEvent} />
       </Grid.Column>
       <Grid.Column width={6}>
         {formOpen && (
-          <EventForm setFormOpen={setFormOpen} addEvent={addEvent} />
+          <EventForm
+            setFormOpen={setFormOpen}
+            addEvent={addEvent}
+            selectedEvent={selectedEvent}
+            key={selectedEvent ? selectedEvent.id : 'create'}
+          />
         )}
       </Grid.Column>
     </Grid>
