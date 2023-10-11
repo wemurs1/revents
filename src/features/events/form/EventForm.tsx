@@ -4,104 +4,87 @@ import { Button, Form, Header, Segment } from 'semantic-ui-react';
 import { useAppDispatch, useAppSelector } from '../../../app/store/store';
 import { createEvent, updateEvent } from '../eventSlice';
 import { createId } from '@paralleldrive/cuid2';
+import { FieldValues, useForm } from 'react-hook-form';
 
 export default function EventForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm({ mode: 'onTouched' });
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   let { id } = useParams();
   const event = useAppSelector((state) =>
     state.events.events.find((e) => e.id === id)
   );
-  const initialValues = event ?? {
-    title: '',
-    category: '',
-    description: '',
-    city: '',
-    venue: '',
-    date: '',
-  };
-  const [values, setValues] = useState(initialValues);
 
-  function onSubmit() {
-    id = id ?? createId();
-    event
-      ? dispatch(updateEvent({ ...event, ...values }))
-      : dispatch(
-          createEvent({
-            ...values,
-            id,
-            hostedBy: 'bob',
-            hostPhotoURL: '',
-            attendees: [],
-          })
-        );
-    navigate(`/events/${id}`);
-  }
+  function onSubmit(data: FieldValues) {
+    console.log(data);
 
-  function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
-    const { value, name } = e.target;
-    setValues({ ...values, [name]: value });
+    // id = id ?? createId();
+    // event
+    //   ? dispatch(updateEvent({ ...event, ...values }))
+    //   : dispatch(
+    //       createEvent({
+    //         ...values,
+    //         id,
+    //         hostedBy: 'bob',
+    //         hostPhotoURL: '',
+    //         attendees: [],
+    //       })
+    //     );
+    // navigate(`/events/${id}`);
   }
 
   return (
     <Segment clearing>
       <Header content={event ? 'Update event' : 'Create event'} />
-      <Form onSubmit={onSubmit}>
-        <Form.Field>
-          <input
-            type='text'
-            placeholder='Event title'
-            value={values.title}
-            name='title'
-            onChange={(e) => handleInputChange(e)}
-          />
-        </Form.Field>
-        <Form.Field>
-          <input
-            type='text'
-            placeholder='Category'
-            value={values.category}
-            name='category'
-            onChange={(e) => handleInputChange(e)}
-          />
-        </Form.Field>
-        <Form.Field>
-          <input
-            type='text'
-            placeholder='Description'
-            value={values.description}
-            name='description'
-            onChange={(e) => handleInputChange(e)}
-          />
-        </Form.Field>
-        <Form.Field>
-          <input
-            type='text'
-            placeholder='City'
-            value={values.city}
-            name='city'
-            onChange={(e) => handleInputChange(e)}
-          />
-        </Form.Field>
-        <Form.Field>
-          <input
-            type='text'
-            placeholder='Venue'
-            value={values.venue}
-            name='venue'
-            onChange={(e) => handleInputChange(e)}
-          />
-        </Form.Field>
-        <Form.Field>
-          <input
-            type='date'
-            placeholder='Date'
-            value={values.date}
-            name='date'
-            onChange={(e) => handleInputChange(e)}
-          />
-        </Form.Field>
-        <Button type='submit' floated='right' positive content='Submit' />
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form.Input
+          placeholder='Event title'
+          defaultValue={event?.title || ''}
+          {...register('title', { required: true })}
+          error={errors.title && 'Title is required'}
+        />
+        <Form.Input
+          placeholder='Category'
+          defaultValue={event?.category}
+          {...register('category', { required: 'Category is required' })}
+          error={errors.category && errors.category.message}
+        />
+        <Form.Input
+          placeholder='Description'
+          defaultValue={event?.description}
+          {...register('description', { required: 'Description is requireed' })}
+          error={errors.description && errors.description.message}
+        />
+        <Form.Input
+          placeholder='City'
+          defaultValue={event?.city}
+          {...register('city', { required: 'City is required' })}
+          error={errors.city && errors.city.message}
+        />
+        <Form.Input
+          placeholder='Venue'
+          defaultValue={event?.venue}
+          {...register('venue', { required: 'Venue is requireed' })}
+          error={errors.venue && errors.venue.message}
+        />
+        <Form.Input
+          type='date'
+          placeholder='Date'
+          defaultValue={event?.date}
+          {...register('date', { required: 'Date is required' })}
+          error={errors.date && errors.date.message}
+        />
+        <Button
+          type='submit'
+          floated='right'
+          positive
+          content='Submit'
+          disabled={!isValid}
+        />
         <Button
           type='button'
           floated='right'
