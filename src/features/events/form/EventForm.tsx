@@ -1,4 +1,3 @@
-import { ChangeEvent, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Form, Header, Segment } from 'semantic-ui-react';
 import { useAppDispatch, useAppSelector } from '../../../app/store/store';
@@ -6,6 +5,8 @@ import { createEvent, updateEvent } from '../eventSlice';
 import { createId } from '@paralleldrive/cuid2';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { categoryOptions } from './categoryOptions';
+import 'react-datepicker/dist/react-datepicker.css';
+import DatePicker from 'react-datepicker';
 
 export default function EventForm() {
   const {
@@ -23,21 +24,20 @@ export default function EventForm() {
   );
 
   function onSubmit(data: FieldValues) {
-    console.log(data);
-
-    // id = id ?? createId();
-    // event
-    //   ? dispatch(updateEvent({ ...event, ...values }))
-    //   : dispatch(
-    //       createEvent({
-    //         ...values,
-    //         id,
-    //         hostedBy: 'bob',
-    //         hostPhotoURL: '',
-    //         attendees: [],
-    //       })
-    //     );
-    // navigate(`/events/${id}`);
+    id = id ?? createId();
+    event
+      ? dispatch(updateEvent({ ...event, ...data, date: data.date.toString() }))
+      : dispatch(
+          createEvent({
+            ...data,
+            id,
+            hostedBy: 'bob',
+            hostPhotoURL: '',
+            attendees: [],
+            date: data.date.toString(),
+          })
+        );
+    navigate(`/events/${id}`);
   }
 
   return (
@@ -87,13 +87,26 @@ export default function EventForm() {
           {...register('venue', { required: 'Venue is requireed' })}
           error={errors.venue && errors.venue.message}
         />
-        <Form.Input
-          type='date'
-          placeholder='Date'
-          defaultValue={event?.date}
-          {...register('date', { required: 'Date is required' })}
-          error={errors.date && errors.date.message}
-        />
+        <Form.Field>
+          <Controller
+            name='date'
+            control={control}
+            rules={{ required: 'Date is required' }}
+            defaultValue={(event && new Date(event.date)) || null}
+            render={({ field }) => (
+              <DatePicker
+                selected={field.value}
+                onChange={(value) =>
+                  setValue('date', value, { shouldValidate: true })
+                }
+                showTimeSelect
+                timeCaption='time'
+                dateFormat='MMM d, yyyy h:mm aa'
+                placeholderText='Event date and time '
+              />
+            )}
+          />
+        </Form.Field>
         <Button
           type='submit'
           floated='right'
