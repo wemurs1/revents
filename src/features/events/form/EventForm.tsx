@@ -4,13 +4,16 @@ import { Button, Form, Header, Segment } from 'semantic-ui-react';
 import { useAppDispatch, useAppSelector } from '../../../app/store/store';
 import { createEvent, updateEvent } from '../eventSlice';
 import { createId } from '@paralleldrive/cuid2';
-import { FieldValues, useForm } from 'react-hook-form';
+import { Controller, FieldValues, useForm } from 'react-hook-form';
+import { categoryOptions } from './categoryOptions';
 
 export default function EventForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    control,
+    setValue,
+    formState: { errors, isValid, isSubmitting },
   } = useForm({ mode: 'onTouched' });
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -39,7 +42,7 @@ export default function EventForm() {
 
   return (
     <Segment clearing>
-      <Header content={event ? 'Update event' : 'Create event'} />
+      <Header content='Event details' sub color='teal' />
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Form.Input
           placeholder='Event title'
@@ -47,18 +50,31 @@ export default function EventForm() {
           {...register('title', { required: true })}
           error={errors.title && 'Title is required'}
         />
-        <Form.Input
-          placeholder='Category'
+        <Controller
+          name='category'
+          control={control}
+          rules={{ required: 'Category is required' }}
           defaultValue={event?.category}
-          {...register('category', { required: 'Category is required' })}
-          error={errors.category && errors.category.message}
+          render={({ field }) => (
+            <Form.Select
+              options={categoryOptions}
+              placeholder='Category'
+              clearable
+              {...field}
+              onChange={(_, d) =>
+                setValue('category', d.value, { shouldValidate: true })
+              }
+              error={errors.category && errors.category.message}
+            />
+          )}
         />
-        <Form.Input
+        <Form.TextArea
           placeholder='Description'
           defaultValue={event?.description}
           {...register('description', { required: 'Description is requireed' })}
           error={errors.description && errors.description.message}
         />
+        <Header sub content='Location details' color='teal' />
         <Form.Input
           placeholder='City'
           defaultValue={event?.city}
@@ -84,6 +100,7 @@ export default function EventForm() {
           positive
           content='Submit'
           disabled={!isValid}
+          loading={isSubmitting}
         />
         <Button
           type='button'
@@ -91,6 +108,7 @@ export default function EventForm() {
           content='Cancel'
           as={Link}
           to='/events'
+          disabled={isSubmitting}
         />
       </Form>
     </Segment>
