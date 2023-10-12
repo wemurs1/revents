@@ -10,15 +10,29 @@ import {
 import EventListAttendee from './EventListAttendee';
 import { AppEvent } from '../../../app/types/event';
 import { Link } from 'react-router-dom';
-import { useAppDispatch } from '../../../app/store/store';
-import { deleteEvent } from '../eventSlice';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
+import { deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../../../app/config/firebase';
 
 type Props = {
   event: AppEvent;
 };
 
 export default function EventListItem({ event }: Props) {
-  const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(false);
+
+  async function removeEvent() {
+    setLoading(true);
+    try {
+      await deleteDoc(doc(db, 'events', event.id));
+    } catch (error: any) {
+      toast.error(error.message);
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <SegmentGroup>
@@ -56,7 +70,8 @@ export default function EventListItem({ event }: Props) {
           color='red'
           floated='right'
           content='Delete'
-          onClick={() => dispatch(deleteEvent(event.id))}
+          onClick={removeEvent}
+          loading={loading}
         />
         <Button
           color='teal'

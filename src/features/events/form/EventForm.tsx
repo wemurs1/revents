@@ -1,12 +1,20 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Form, Header, Segment } from 'semantic-ui-react';
-import { useAppDispatch, useAppSelector } from '../../../app/store/store';
-import { createEvent, updateEvent } from '../eventSlice';
-import { createId } from '@paralleldrive/cuid2';
+import { useAppSelector } from '../../../app/store/store';
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { categoryOptions } from './categoryOptions';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
+import { AppEvent } from '../../../app/types/event';
+import {
+  Timestamp,
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
+import { db } from '../../../app/config/firebase';
+import { toast } from 'react-toastify';
 
 export default function EventForm() {
   const {
@@ -16,28 +24,46 @@ export default function EventForm() {
     setValue,
     formState: { errors, isValid, isSubmitting },
   } = useForm({ mode: 'onTouched' });
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  let { id } = useParams();
+  const { id } = useParams();
   const event = useAppSelector((state) =>
     state.events.events.find((e) => e.id === id)
   );
 
-  function onSubmit(data: FieldValues) {
-    id = id ?? createId();
-    event
-      ? dispatch(updateEvent({ ...event, ...data, date: data.date.toString() }))
-      : dispatch(
-          createEvent({
-            ...data,
-            id,
-            hostedBy: 'bob',
-            hostPhotoURL: '',
-            attendees: [],
-            date: data.date.toString(),
-          })
-        );
-    navigate(`/events/${id}`);
+  async function updateEvent(data: AppEvent) {
+    if (!event) return;
+    const docRef = doc(db, 'events', event.id);
+    await updateDoc(docRef, {
+      ...data,
+      date: Timestamp.fromDate(data.date as unknown as Date),
+    });
+  }
+
+  async function createEvent(data: FieldValues) {
+    const newEventRef = doc(collection(db, 'events'));
+    await setDoc(newEventRef, {
+      ...data,
+      hostedBy: 'bob',
+      hostPhotoURL: '',
+      attendees: [],
+      date: Timestamp.fromDate(data.date as unknown as Date),
+    });
+    return newEventRef;
+  }
+
+  async function onSubmit(data: FieldValues) {
+    try {
+      if (event) {
+        await updateEvent({ ...event, ...data });
+        navigate(`/events/${event.id}`);
+      } else {
+        const ref = await createEvent(data);
+        navigate(`/events/${ref.id}`);
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+      console.log(error);
+    }
   }
 
   return (
