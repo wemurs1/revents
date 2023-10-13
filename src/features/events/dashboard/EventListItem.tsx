@@ -3,6 +3,7 @@ import {
   Icon,
   Item,
   ItemGroup,
+  Label,
   List,
   Segment,
   SegmentGroup,
@@ -10,15 +11,12 @@ import {
 import EventListAttendee from './EventListAttendee';
 import { AppEvent } from '../../../app/types/event';
 import { Link } from 'react-router-dom';
-import { useFireStore } from '../../../app/hooks/firestore/useFireStore';
 
 type Props = {
   event: AppEvent;
 };
 
 export default function EventListItem({ event }: Props) {
-  const { remove } = useFireStore('events');
-
   return (
     <SegmentGroup>
       <Segment>
@@ -32,6 +30,14 @@ export default function EventListItem({ event }: Props) {
             <Item.Content>
               <Item.Header>{event.title}</Item.Header>
               <Item.Description>Hosted by {event.hostedBy}</Item.Description>
+              {event.isCancelled && (
+                <Label
+                  stype={{ top: '-40px' }}
+                  ribbon='right'
+                  color='red'
+                  content='This event has been cancelled'
+                />
+              )}
             </Item.Content>
           </Item>
         </ItemGroup>
@@ -51,12 +57,6 @@ export default function EventListItem({ event }: Props) {
       </Segment>
       <Segment clearing>
         <span>{event.description}</span>
-        <Button
-          color='red'
-          floated='right'
-          content='Delete'
-          onClick={() => remove(event.id)}
-        />
         <Button
           color='teal'
           floated='right'
