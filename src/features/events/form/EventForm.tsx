@@ -6,14 +6,7 @@ import { categoryOptions } from './categoryOptions';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
 import { AppEvent } from '../../../app/types/event';
-import {
-  Timestamp,
-  collection,
-  doc,
-  setDoc,
-  updateDoc,
-} from 'firebase/firestore';
-import { db } from '../../../app/config/firebase';
+import { Timestamp } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { useFireStore } from '../../../app/hooks/firestore/useFireStore';
 import { useEffect } from 'react';
@@ -21,7 +14,7 @@ import { actions } from '../eventSlice';
 import LoadingComponent from '../../../app/layout/LoadingComponent';
 
 export default function EventForm() {
-  const { loadDocument } = useFireStore('events');
+  const { loadDocument, create, update } = useFireStore('events');
   const {
     register,
     handleSubmit,
@@ -48,23 +41,21 @@ export default function EventForm() {
 
   async function updateEvent(data: AppEvent) {
     if (!event) return;
-    const docRef = doc(db, 'events', event.id);
-    await updateDoc(docRef, {
+    await update(data.id, {
       ...data,
       date: Timestamp.fromDate(data.date as unknown as Date),
     });
   }
 
   async function createEvent(data: FieldValues) {
-    const newEventRef = doc(collection(db, 'events'));
-    await setDoc(newEventRef, {
+    const ref = await create({
       ...data,
       hostedBy: 'bob',
       hostPhotoURL: '',
       attendees: [],
       date: Timestamp.fromDate(data.date as unknown as Date),
     });
-    return newEventRef;
+    return ref;
   }
 
   async function onSubmit(data: FieldValues) {
@@ -74,7 +65,7 @@ export default function EventForm() {
         navigate(`/events/${event.id}`);
       } else {
         const ref = await createEvent(data);
-        navigate(`/events/${ref.id}`);
+        navigate(`/events/${ref?.id}`);
       }
     } catch (error: any) {
       toast.error(error.message);
