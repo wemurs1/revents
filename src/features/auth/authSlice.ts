@@ -26,11 +26,11 @@ export const authSlice = createSlice({
                 return { payload: mapped };
             }
         },
-        signOut: (state) => {
+        logOut: (state) => {
             state.authenticated = false,
                 state.currentUser = null
         }
     }
 })
 
-export const { signIn, signOut } = authSlice.actions
+export const { signIn, logOut } = authSlice.actions
