@@ -108,6 +108,15 @@ export default function AccountPage() {
           </Button>
         </div>
       )}
+      {currentUser?.providerId === 'microsoft.com' && (
+        <div>
+          <Header color='teal' sub content='Microsoft account' />
+          <p>Please visit Microsoft to update your account settings</p>
+          <Button as={Link} to='https://live.com' color='blue'>
+            <Icon name='microsoft' /> Goto Microsoft
+          </Button>
+        </div>
+      )}
     </Segment>
   );
 }

@@ -6,6 +6,7 @@ import {
   AuthProvider,
   GithubAuthProvider,
   GoogleAuthProvider,
+  OAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
 import { toast } from 'react-toastify';
@@ -29,6 +30,8 @@ export default function SocialLogin() {
       provider = new GithubAuthProvider();
     } else if (selectedProvider === 'google') {
       provider = new GoogleAuthProvider();
+    } else if (selectedProvider === 'microsoft') {
+      provider = new OAuthProvider('microsoft.com');
     } else return;
 
     try {
@@ -77,6 +80,16 @@ export default function SocialLogin() {
         onClick={() => handleSocialLogin('google')}
       >
         <Icon name='google' /> Login with Google
+      </Button>
+      <Button
+        type='button'
+        fluid
+        color='blue'
+        style={{ marginBottom: 10 }}
+        loading={status.loading && status.provider === 'microsoft'}
+        onClick={() => handleSocialLogin('microsoft')}
+      >
+        <Icon name='microsoft' /> Login with Microsoft
       </Button>
     </>
   );
