@@ -20,11 +20,17 @@ export default function SignedInMenu() {
         <Dropdown.Menu>
           <Dropdown.Item
             as={Link}
-            to='createEvent'
+            to='/createEvent'
             text='Create event'
             icon='plus'
           />
           <Dropdown.Item text='My profile' icon='user' />
+          <Dropdown.Item
+            text='My account'
+            icon='settings'
+            as={Link}
+            to='/account'
+          />
           <Dropdown.Item text='Sign out' icon='power' onClick={handleSignOut} />
         </Dropdown.Menu>
       </Dropdown>
