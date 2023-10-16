@@ -1,6 +1,11 @@
 import { Segment, Item } from 'semantic-ui-react';
+import { AppEvent } from '../../../app/types/event';
 
-export default function EventDetailedSidebar() {
+type Props = {
+  event: AppEvent;
+};
+
+export default function EventDetailedSidebar({ event }: Props) {
   return (
     <>
       <Segment
@@ -11,26 +16,20 @@ export default function EventDetailedSidebar() {
         inverted
         color='teal'
       >
-        2 People Going
+        {event.attendees.length} People Going
       </Segment>
       <Segment attached>
         <Item.Group relaxed divided>
-          <Item style={{ position: 'relative' }}>
-            <Item.Image size='tiny' src='/user.png' />
-            <Item.Content verticalAlign='middle'>
-              <Item.Header as='h3'>
-                <span>Tom</span>
-              </Item.Header>
-            </Item.Content>
-          </Item>
-          <Item style={{ position: 'relative' }}>
-            <Item.Image size='tiny' src='/user.png' />
-            <Item.Content verticalAlign='middle'>
-              <Item.Header as='h3'>
-                <span>Bob</span>
-              </Item.Header>
-            </Item.Content>
-          </Item>
+          {event.attendees.map((attendee) => (
+            <Item style={{ position: 'relative' }} key={attendee.id}>
+              <Item.Image size='tiny' src={attendee.photoURL || '/user.png'} />
+              <Item.Content verticalAlign='middle'>
+                <Item.Header as='h3'>
+                  <span>{attendee.displayName}</span>
+                </Item.Header>
+              </Item.Content>
+            </Item>
+          ))}
         </Item.Group>
       </Segment>
     </>
