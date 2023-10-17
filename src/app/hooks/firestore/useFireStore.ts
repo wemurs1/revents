@@ -4,6 +4,8 @@ import { GenericActions } from "../../store/genericSlice";
 import { DocumentData, collection, deleteDoc, doc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { toast } from "react-toastify";
+import { CollectionOptions } from "./types";
+import { getQuery } from "./getQuery";
 
 type ListenerState = {
     name?: string;
@@ -31,35 +33,31 @@ export const useFireStore = <T extends DocumentData>(path: string) => {
 
     const dispatch = useAppDispatch();
 
-    const loadCollection = useCallback((actions: GenericActions<T>) => {
+    const loadCollection = useCallback((actions: GenericActions<T>, options?: CollectionOptions) => {
         dispatch(actions.loading());
 
-        const query = collection(db, path);
+        const query = getQuery(path, options);
 
         const listener = onSnapshot(query, {
             next: querySnapshot => {
                 const data: DocumentData[] = [];
-
                 if (querySnapshot.empty) {
                     dispatch(actions.success([] as unknown as T));
                     return;
                 }
-
                 querySnapshot.forEach(doc => {
                     data.push({ id: doc.id, ...doc.data() })
-                });
-
-                dispatch(actions.success(data as unknown as T));
+                })
+                dispatch(actions.success(data as unknown as T))
             },
             error: error => {
                 dispatch(actions.error(error.message));
-                console.log('Collection error: ', error.message);
+                console.log('Collection error:', error.message);
             }
-        });
-
+        })
         listenersRef.current.push({ name: path, unsubscribe: listener });
 
-    }, [dispatch, path]);
+    }, [dispatch, path])
 
     const loadDocument = useCallback((id: string, actions: GenericActions<T>) => {
         dispatch(actions.loading());
