@@ -7,9 +7,11 @@ import { auth, fb } from '../../../app/config/firebase';
 
 type Props = {
   eventId: string;
+  parentId?: string | null;
+  setReplyForm?: (values: any) => void;
 };
 
-export default function ChatForm({ eventId }: Props) {
+export default function ChatForm({ eventId, parentId, setReplyForm }: Props) {
   const {
     register,
     handleSubmit,
@@ -27,7 +29,10 @@ export default function ChatForm({ eventId }: Props) {
         uid: auth.currentUser?.uid,
         text: data.comment,
         date: Date.now(),
+        parentId: parentId || null,
       });
+      if (parentId && setReplyForm)
+        setReplyForm({ open: false, commentId: null });
       reset();
     } catch (error: any) {
       toast.error(error.message);
