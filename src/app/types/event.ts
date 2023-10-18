@@ -28,5 +28,5 @@ export type ChatComment = {
     photoURL: string;
     uid: string;
     text: string;
-    date: string;
+    date: number;
 }

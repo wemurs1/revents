@@ -3,6 +3,7 @@ import { Profile } from '../../app/types/profile';
 import { useState } from 'react';
 import ProfileForm from './ProfileForm';
 import { auth } from '../../app/config/firebase';
+import { format } from 'date-fns';
 
 type Props = {
   profile: Profile;
@@ -36,7 +37,10 @@ export default function ProfileAbout({ profile }: Props) {
           ) : (
             <>
               <div style={{ marginBottom: 10 }}>
-                <strong>Member since: {profile.createdAt}</strong>
+                <strong>
+                  Member since:{' '}
+                  {format(new Date(profile.createdAt), 'dd MMM yyyy, h:mm a')}
+                </strong>
                 <div style={{ marginTop: 10 }}>{profile.description}</div>
               </div>
             </>
