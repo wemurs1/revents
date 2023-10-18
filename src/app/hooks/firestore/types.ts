@@ -15,7 +15,7 @@ export type QueryOptions = {
     value: string | number | boolean | Date | any[]
 }
 
-type SortOptions = {
+export type SortOptions = {
     attribute: string,
     order: OrderByDirection
 }
