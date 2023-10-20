@@ -1,4 +1,4 @@
-import { Button, Grid } from 'semantic-ui-react';
+import { Grid } from 'semantic-ui-react';
 import EventList from './EventList';
 import { useAppDispatch, useAppSelector } from '../../../app/store/store';
 import { useCallback, useEffect, useState } from 'react';
@@ -55,16 +55,12 @@ export default function EventDashboard() {
             <EventListItemPlaceholder />
           </>
         ) : (
-          <>
-            <EventList events={events} />
-            <Button
-              content='Load more'
-              color='green'
-              onClick={loadMore}
-              disabled={!hasMore.current}
-              loading={status === 'loading'}
-            />
-          </>
+          <EventList
+            events={events}
+            hasMore={hasMore.current}
+            loadMore={loadMore}
+            loading={status === 'loading'}
+          />
         )}
       </Grid.Column>
       <Grid.Column width={6}>
