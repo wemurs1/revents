@@ -28,6 +28,7 @@ export default function EventDashboard() {
         sort: { attribute: 'date', order: 'asc' },
         pagination: true,
         reset,
+        get: true,
       });
     },
     [loadCollection, query]
