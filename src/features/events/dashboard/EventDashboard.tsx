@@ -1,7 +1,7 @@
 import { Button, Grid } from 'semantic-ui-react';
 import EventList from './EventList';
-import { useAppSelector } from '../../../app/store/store';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../../app/store/store';
+import { useCallback, useEffect, useState } from 'react';
 import { actions } from '../eventSlice';
 import { useFireStore } from '../../../app/hooks/firestore/useFireStore';
 import EventFilters from './EventFilters';
@@ -9,7 +9,7 @@ import { QueryOptions } from '../../../app/hooks/firestore/types';
 import EventListItemPlaceholder from './EventListItemPlaceholder';
 
 export default function EventDashboard() {
-  const contextRef = useRef(null);
+  const dispatch = useAppDispatch();
   const {
     data: events,
     status,
@@ -20,19 +20,26 @@ export default function EventDashboard() {
     { attribute: 'date', operator: '>=', value: new Date() },
   ]);
 
-  const loadEvents = useCallback((reset?: boolean) => {
-    loadCollection(actions, {
-      queries: query,
-      limit: 2,
-      sort: { attribute: 'date', order: 'asc' },
-      pagination: true,
-      reset,
-    });
-  }, []);
+  const loadEvents = useCallback(
+    (reset?: boolean) => {
+      loadCollection(actions, {
+        queries: query,
+        limit: 2,
+        sort: { attribute: 'date', order: 'asc' },
+        pagination: true,
+        reset,
+      });
+    },
+    [loadCollection, query]
+  );
 
   useEffect(() => {
     loadEvents(true);
-  }, [loadEvents]);
+
+    return () => {
+      dispatch(actions.reset());
+    };
+  }, [loadEvents, dispatch]);
 
   function loadMore() {
     loadEvents();
@@ -40,7 +47,7 @@ export default function EventDashboard() {
 
   return (
     <Grid>
-      <Grid.Column width={10} ref={contextRef}>
+      <Grid.Column width={10}>
         {!loadedInitial ? (
           <>
             <EventListItemPlaceholder />
