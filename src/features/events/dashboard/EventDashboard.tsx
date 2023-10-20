@@ -10,7 +10,11 @@ import EventListItemPlaceholder from './EventListItemPlaceholder';
 
 export default function EventDashboard() {
   const contextRef = useRef(null);
-  const { data: events, status } = useAppSelector((state) => state.events);
+  const {
+    data: events,
+    status,
+    loadedInitial,
+  } = useAppSelector((state) => state.events);
   const { loadCollection, hasMore } = useFireStore('events');
   const [query, setQuery] = useState<QueryOptions[]>([
     { attribute: 'date', operator: '>=', value: new Date() },
@@ -37,7 +41,7 @@ export default function EventDashboard() {
   return (
     <Grid>
       <Grid.Column width={10} ref={contextRef}>
-        {status === 'loading' ? (
+        {!loadedInitial ? (
           <>
             <EventListItemPlaceholder />
             <EventListItemPlaceholder />
@@ -50,6 +54,7 @@ export default function EventDashboard() {
               color='green'
               onClick={loadMore}
               disabled={!hasMore.current}
+              loading={status === 'loading'}
             />
           </>
         )}
