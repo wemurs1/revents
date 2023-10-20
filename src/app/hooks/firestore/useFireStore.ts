@@ -44,9 +44,9 @@ export const useFireStore = <T extends DocumentData>(path: string) => {
         dispatch(actions.loading());
 
         const query = getQuery(path, options, lastDocRef);
-        const data: DocumentData[] = [];
 
         const processQuery = (querySnapshot: QuerySnapshot<DocumentData, DocumentData>) => {
+            const data: DocumentData[] = [];
             if (querySnapshot.empty) {
                 hasMore.current = false;
                 dispatch(actions.success([] as unknown as T));
