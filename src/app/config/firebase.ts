@@ -8,6 +8,12 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { getDatabase } from "firebase/database";
+import { ReCaptchaV3Provider, initializeAppCheck } from "firebase/app-check";
+
+declare global {
+    // eslint-disable-next-line no-var
+    var FIREBASE_APPCHECK_DEBUG_TOKEN: boolean | string | undefined
+}
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -20,8 +26,17 @@ const firebaseConfig = {
     appId: "1:98300442331:web:6118d4b55d90ec29067efe"
 };
 
+if (import.meta.env.DEV) {
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true
+}
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider('6LdO5cMoAAAAANBwz-488X4rJWrTvPMsQ8xLEBVs'),
+    isTokenAutoRefreshEnabled: true
+})
 
 export const db = getFirestore(app);
 export const auth = getAuth(app);
