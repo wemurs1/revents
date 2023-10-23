@@ -39,6 +39,7 @@ export const useFireStore = <T extends DocumentData>(path: string) => {
         if (options?.reset) {
             lastDocRef.current = null;
             hasMore.current = true;
+            dispatch(actions.reset())
         }
 
         dispatch(actions.loading());
