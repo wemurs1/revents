@@ -1,0 +1,56 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  	match /profiles/{profileId} {
+  		allow read: if request.auth.uid != null;
+  		allow write: if request.auth.uid == profileId;
+      allow update: if isAllowedToUpdateFollowFields(request, resource);
+  		match /photos/{document=**} {
+   			allow read: if request.auth.uid != null;
+   			allow write: if request.auth.uid == profileId;
+  		}
+      match /followers/{followerId} {
+      	allow read: if request.auth.uid != null;
+        allow write: if request.auth.uid == followerId;
+      }
+      match /following/{followingId} {
+      	allow read: if request.auth.uid != null;
+        allow write: if request.auth.uid == profileId;
+      }
+  	}
+    match /events/{document=**} {
+    	allow read, list;
+      allow create: if request.auth.uid != null && isValidEvent(request);
+      allow update: if request.auth.uid == resource.data.hostUid;
+      allow update: if allowUpdateAttendees(request, resource);
+    }
+  }
+}
+
+function allowUpdateAttendees(request, resource) {
+	return (request.auth.uid != null && request.resource.data.diff(resource.data).affectedKeys()
+        	.hasOnly(['attendeeIds','attendees']))
+}
+
+function isAllowedToUpdateFollowFields(request, resource) {
+	return request.auth.uid != null 
+      	&& request.resource.data.diff(resource.data).affectedKeys()
+        	.hasOnly(['followerCount','followingCount']);
+}
+
+function isValidEvent(request) {
+	return (request.resource.data.keys().hasOnly([
+  	'title',
+    'category',
+    'description',
+    'date',
+    'city',
+    'venue',
+    'hostedBy',
+    'hostPhotoURL',
+    'hostUid',
+    'attendees',
+    'attendeeIds'
+  ]))
+}
