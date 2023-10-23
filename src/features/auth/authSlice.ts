@@ -2,9 +2,9 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import { AppUser } from "../../app/types/user"
 import { User } from "firebase/auth"
 
-type State = { authenticated: boolean, currentUser: AppUser | null }
+type State = { authenticated: boolean, currentUser: AppUser | null, initialised: boolean }
 
-const initialState: State = { authenticated: false, currentUser: null }
+const initialState: State = { authenticated: false, currentUser: null, initialised: false }
 
 export const authSlice = createSlice({
     name: 'auth',
@@ -13,7 +13,8 @@ export const authSlice = createSlice({
         signIn: {
             reducer: (state, action: PayloadAction<AppUser>) => {
                 state.authenticated = true,
-                    state.currentUser = action.payload
+                    state.currentUser = action.payload,
+                    state.initialised = true
             },
             prepare: (user: User) => {
                 const mapped: AppUser = {
@@ -28,7 +29,8 @@ export const authSlice = createSlice({
         },
         logOut: (state) => {
             state.authenticated = false,
-                state.currentUser = null
+                state.currentUser = null,
+                state.initialised = true
         }
     }
 })

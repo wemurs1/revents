@@ -1,13 +1,14 @@
 import { Button, Form, Label } from 'semantic-ui-react';
 import ModalWrapper from '../../app/common/modals/ModalWrapper';
 import { FieldValues, useForm } from 'react-hook-form';
-import { useAppDispatch } from '../../app/store/store';
+import { useAppDispatch, useAppSelector } from '../../app/store/store';
 import { closeModal } from '../../app/common/modals/modalSlice';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../../app/config/firebase';
 import { signIn } from './authSlice';
 import { useFireStore } from '../../app/hooks/firestore/useFireStore';
 import { Timestamp } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 export default function RegisterForm() {
   const {
@@ -18,6 +19,8 @@ export default function RegisterForm() {
   } = useForm({ mode: 'onTouched' });
   const { set } = useFireStore('profiles');
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { data: location } = useAppSelector((state) => state.modals);
 
   async function onSubmit(data: FieldValues) {
     try {
@@ -34,6 +37,7 @@ export default function RegisterForm() {
       });
       dispatch(signIn(userCreds.user));
       dispatch(closeModal());
+      navigate(location.from);
     } catch (error: any) {
       setError('root.serverError', {
         type: '400',
