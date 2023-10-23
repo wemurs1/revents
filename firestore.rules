@@ -59,7 +59,6 @@ function isValidEvent(request) {
     'city',
     'venue',
     'hostedBy',
-    'hostPhotoURL',
     'hostUid',
     'attendees',
     'attendeeIds'
