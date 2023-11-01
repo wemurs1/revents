@@ -1,13 +1,17 @@
-import { Button, Dropdown } from 'semantic-ui-react';
+import { Button, Dropdown, Icon } from 'semantic-ui-react';
 import { useAppDispatch, useAppSelector } from '../../app/store/store';
 import { decrement, increment, incrementByAmount } from './testSlice';
 import { openModal } from '../../app/common/modals/modalSlice';
 import usePlacesAutocomplete, {
+  LatLng,
   getGeocode,
   getLatLng,
 } from 'use-places-autocomplete';
+import { GoogleMap, MarkerF } from '@react-google-maps/api';
+import { useState } from 'react';
 
 export default function Scratch() {
+  const [location, setLocation] = useState<LatLng>({ lat: 59.95, lng: 30.33 });
   const {
     suggestions: { data: locations, loading },
     setValue,
@@ -18,7 +22,7 @@ export default function Scratch() {
   async function handlePlaceSelect(value: any) {
     const results = await getGeocode({ address: value });
     const latlng = getLatLng(results[0]);
-    console.log(latlng);
+    setLocation(latlng)
   }
 
   return (
@@ -63,6 +67,27 @@ export default function Scratch() {
           handlePlaceSelect(data.value);
         }}
       />
+      <GoogleMap
+        mapContainerStyle={{
+          width: '100%',
+          height: '50vh',
+          marginTop: 20,
+        }}
+        center={{
+          lat: location.lat,
+          lng: location.lng,
+        }}
+        zoom={14}
+      >
+        <MarkerF
+          position={{
+            lat: location.lat,
+            lng: location.lng,
+          }}
+        >
+          <Icon name='map marker' color='red' />
+        </MarkerF>
+      </GoogleMap>
     </div>
   );
 }
