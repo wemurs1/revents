@@ -7,6 +7,7 @@ import { useFireStore } from '../../../app/hooks/firestore/useFireStore';
 import EventFilters from './EventFilters';
 import { QueryOptions } from '../../../app/hooks/firestore/types';
 import EventListItemPlaceholder from './EventListItemPlaceholder';
+import EmptyState from '../../../app/layout/EmptyState';
 
 export default function EventDashboard() {
   const dispatch = useAppDispatch();
@@ -55,16 +56,25 @@ export default function EventDashboard() {
             <EventListItemPlaceholder />
           </>
         ) : (
-          <EventList
-            events={events}
-            hasMore={hasMore.current}
-            loadMore={loadMore}
-            loading={status === 'loading'}
-          />
+          <>
+            {events.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <EventList
+                events={events}
+                hasMore={hasMore.current}
+                loadMore={loadMore}
+                loading={status === 'loading'}
+              />
+            )}
+          </>
         )}
       </Grid.Column>
       <Grid.Column width={6}>
-        <div className='ui fixed top sticky' style={{ top: 98, width: 405, zIndex: 1 }}>
+        <div
+          className='ui fixed top sticky'
+          style={{ top: 98, width: 405, zIndex: 1 }}
+        >
           <EventFilters setQuery={setQuery} />
         </div>
       </Grid.Column>
