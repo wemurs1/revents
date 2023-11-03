@@ -7,7 +7,7 @@ import { Feed, Header, Segment } from 'semantic-ui-react';
 export default function NewsFeed() {
   const { currentUser } = useAppSelector((state) => state.auth);
   const { loadCollection } = useFireStore(
-    `profile/${currentUser?.uid}/newsfeed`
+    `profiles/${currentUser?.uid}/newsfeed`
   );
   const { data, status } = useAppSelector((state) => state.feed);
 
