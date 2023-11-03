@@ -3,6 +3,7 @@ import { useFireStore } from '../../../app/hooks/firestore/useFireStore';
 import { useAppSelector } from '../../../app/store/store';
 import { actions } from './feedSlice';
 import { Feed, Header, Segment } from 'semantic-ui-react';
+import FeedItem from './FeedItem';
 
 export default function NewsFeed() {
   const { currentUser } = useAppSelector((state) => state.auth);
@@ -25,7 +26,7 @@ export default function NewsFeed() {
         {data.length > 0 ? (
           <Feed>
             {data.map((post) => (
-              <Feed.Event key={post.id} summary={post.status} />
+              <FeedItem key={post.id} post={post} />
             ))}
           </Feed>
         ) : (

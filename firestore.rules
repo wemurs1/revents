@@ -19,7 +19,7 @@ service cloud.firestore {
         allow write: if request.auth.uid == profileId;
       }
       match /newsfeed/{document=**} {
-      allow read: if request.auth.uid == profileId;
+      allow list: if request.auth.uid == profileId && request.query.limit == 5;
       }
   	}
     match /events/{document=**} {
